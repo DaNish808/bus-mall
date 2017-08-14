@@ -45,14 +45,37 @@ David Nishikawa
 
     As the site developer, I want an object constructor for my products.
 
-    As the site developer, I want properties in my product objects to account for name, image, description, vote count (array), show count (array), and id.
+    As the site developer, I want properties in my product objects to account for
+        name,
+        image, 
+        description, 
+        vote count (array), 
+        show count (array), 
+        id.
 
     As the site developer, I want methods in my product objects that will, 
         render the product image and description,
         return the precentage of votes per shown for this product,
-        handle the vote event and log vote and show counts,
+        fire the vote event and log vote and show counts,
 
     As the site developer, I want an object literal that will handle the overall survey.
 
-    As the site developer, I want my survey object to have properties for the 
+    As the site developer, I want my survey object to have properties for
+        the array of products
+        total number of votes
+        the element containers for the images
+        the element containers for the descriptions
+        the element container for the voting area
+
+    As the site developer, I want my survey object to have methods to
+        iterate over 25 votes
+        for each vote
+            select three random products
+            render the three selected products to the page
+            set up event listener on the voting area container
+                fire vote event method in the product object called
+        display results of poll to page
+
+
+
     
