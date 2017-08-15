@@ -15,15 +15,15 @@ function Product(name, image, description, id) {
 }
 
 Product.prototype.getVoteCount = function() {
-    return voted.length;
+    return this.voted.length;
 }
 
 Product.prototype.getShowCount = function() {
-    return shown.length;
+    return this.shown.length;
 }
 
 Product.prototype.getPercentVote = function() {
-    return (voted.length * shown.length) * 100 + '%';
+    return (this.voted.length / this.shown.length) * 100 + '%';
 }
 
 
@@ -31,8 +31,11 @@ var surveyor = {
     products: [],
     usedOptionIndices: [],
     numOptions: 3,
-    numVotes: 3,
+    numVotes: 25,
     voteCount: 0,
+
+    results: [ ['product', 'votes', 'shown', 'percentage'] ],
+
     elVoteBox: document.getElementById('vote-box'),
     elOptionImages: [],
     elOptionDescriptions: [],
@@ -113,16 +116,36 @@ var surveyor = {
         }
     },
 
+    calcProductsShown: function() {
+        for(var i = 0; i < surveyor.usedOptionIndices.length; i++) {
+            surveyor.products[surveyor.usedOptionIndices[i]].shown.push(surveyor.usedOptionIndices[i]);
+        }
+    },
+
+    showResults: function(e) {
+        for(var i = 0; i < names.length; i++) {
+            var productData = [];
+            productData.push(surveyor.products[i].name);
+            productData.push(surveyor.products[i].getVoteCount());
+            productData.push(surveyor.products[i].getShowCount());
+            productData.push(surveyor.products[i].getPercentVote());
+            surveyor.results.push(productData);
+        }
+        console.table(surveyor.results);
+    },
+
     vote: function(e) {
         surveyor.products[parseInt(e.target.getAttribute('data-index'))].voted.push(surveyor.voteCount);
         console.log(surveyor.voteCount);
-        if(surveyor.voteCount < surveyor.numVotes) {
+        if(surveyor.voteCount + 1 < surveyor.numVotes) {
             surveyor.voteCount++;
             surveyor.renderOptions();
         }
         else {
             console.log('survey over');
+            surveyor.calcProductsShown();
             surveyor.elVoteBox.removeEventListener('click', surveyor.vote, false);
+            surveyor.showResults();
         }
     },
 
