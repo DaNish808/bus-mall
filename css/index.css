@@ -42,6 +42,11 @@ h1 {
     background-color: white;
 }
 
+.vote-option:hover {
+    border: solid 2px lightsteelblue; 
+    box-shadow: 0 0 1em lightsteelblue;
+}
+
 img {
     height: 300px;
     width: 300px;
