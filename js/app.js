@@ -38,10 +38,10 @@ var surveyor = {
     products: [],
     usedOptionIndices: [],      // logs every displayed product in order
     numOptions: 3,      // sets number of options displayed per vote
-    numVotes: 30,      // sets number of votes per survey
+    numVotes: 3,      // sets number of votes per survey
     voteCount: 0,       // iterates with each vote until (voteCount === numVotes)
 
-    results: [ ['product', 'votes', 'shown', 'percentage'] ],       // temporary array for tablulating voting results in console (logResults method)
+    results: [ ['Product', 'Votes', 'Shown', 'Percentage'] ],       // temporary array for tablulating voting results in console (logResults method)
 
     elVoteBox: document.getElementById('vote-box'),     // parent container of image options
     elOptionImages: [],         // elOptionImages and elOptionDescritions are populated in the setOptionElement method
@@ -161,7 +161,17 @@ var surveyor = {
                 var elTr = document.createElement('tr');
                     for(var j = 0; j < surveyor.results[0].length; j++) {
                         var elTd = document.createElement('td');
-                            elTd.innerText = surveyor.results[i][j];
+                            if(j < 1) {
+                                elTd.innerText = surveyor.results[i][j];
+                                elTd.setAttribute('class', 'popup-image')
+                                var elImg = document.createElement('img');
+                                    elImg.setAttribute('src', surveyor.products[i-1].image);
+                                    elImg.setAttribute('class', 'table-image');
+                                elTd.appendChild(elImg);
+                            }
+                            else {
+                                elTd.innerText = surveyor.results[i][j];
+                            }
                         elTr.appendChild(elTd);
                     }
                 elTable.appendChild(elTr);
