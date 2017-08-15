@@ -66,17 +66,25 @@ th {
 td {
     text-align: center;
     vertical-align: middle;
+    overflow-y: visible;
 }
 
 .popup-image {
     width: 33%;
 }
 
+.popup-image:hover {
+    background-color: lightyellow;
+}
+
 .popup-image:hover .table-image {
-    display: block; 
+    display: inline-block;
+    position: absolute;
+    right: 82%;
     height: 100px;
     width: auto;
-    float: left;
+    border: 3px solid lightsteelblue;
+    box-shadow: 0 0 2em lightsteelblue;
 }
 
 .table-image {
