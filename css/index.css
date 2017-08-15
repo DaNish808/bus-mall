@@ -11,6 +11,7 @@ html, body {
 
 header {
     text-align: center;
+    font-family: 'Arima Madurai', cursive;
 }
 
 h1 {
@@ -40,6 +41,8 @@ h1 {
     justify-content: space-between;
     align-items: center;
     background-color: white;
+    font-family: 'Gloria Hallelujah', cursive;
+    line-height: 2em;
 }
 
 .vote-option:hover {
@@ -48,8 +51,21 @@ h1 {
 }
 
 img {
-    height: 300px;
+     height: 300px; 
     width: 300px;
+}
+
+.option-description {
+    position: relative;
+    bottom: 0.3em;
+}
+
+#results-chart {
+    height: 400px;
+    width: 70%;
+    box-sizing: border-box;
+    font-family: 'Hind', sans-serif;
+    display: none;
 }
 
 table {
@@ -57,6 +73,7 @@ table {
     margin: auto;
     padding: 10px;
     background-color: lightskyblue;
+    line-height: 1.6em;
 }
 
 th {
@@ -73,11 +90,11 @@ td {
     width: 33%;
 }
 
-.popup-image:hover {
-    background-color: lightyellow;
+tr:hover {
+    background-color: lightyellow !important;
 }
 
-.popup-image:hover .table-image {
+tr:hover .table-image {
     display: inline-block;
     position: absolute;
     right: 82%;

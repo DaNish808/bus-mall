@@ -38,7 +38,7 @@ var surveyor = {
     products: [],
     usedOptionIndices: [],      // logs every displayed product in order
     numOptions: 3,      // sets number of options displayed per vote
-    numVotes: 3,      // sets number of votes per survey
+    numVotes: 500,      // sets number of votes per survey
     voteCount: 0,       // iterates with each vote until (voteCount === numVotes)
 
     results: [ ['Product', 'Votes', 'Shown', 'Percentage'] ],       // temporary array for tablulating voting results in console (logResults method)
@@ -222,6 +222,24 @@ var surveyor = {
         this.instantiateProducts();        // creating the product objects in the .products property
         this.setListener();                // setting up the 'click' event listener
         this.renderOptions();              // and rendering the first set of voting options to the page
+    },
+
+    testSurvey: function(iterations) {     // fires when user clicks an image
+        surveyor.survey();
+        for(iterations; iterations > 0; iterations--) {
+            surveyor.products[parseInt(surveyor.elOptionDescriptions[0].getAttribute('data-index'))].voted.push(surveyor.voteCount);
+            // pushes the current voteCount onto the clicked product's voted log.
+            // productName.voted.length is used by the getVoteCount Property method
+            console.log(surveyor.voteCount);
+            surveyor.voteCount++;                           // increment the voteCount
+            surveyor.renderOptions();                       // and display next set of voting options
+        }                                  // else if the user has used up all their votes
+        console.log('survey over');                     // use the displayed products log (.usedOptionIndices) to calculate
+        surveyor.calcProductsShown();                   // the show count for each product
+        surveyor.elVoteBox.removeEventListener('click', surveyor.vote, false);  // remove event listener
+        surveyor.switchLayout();                        // removes vote-box and adds results-box
+        surveyor.logResults();                         // and show results
+        surveyor.renderResults();
     }
 }
 
