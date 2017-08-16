@@ -166,6 +166,8 @@ var surveyor = {
         document.getElementById('voting-header').setAttribute('class', 'hidden');
         document.getElementById('results-header').removeAttribute('class');
         document.getElementById('canvas').removeAttribute('class');
+        document.getElementById('canvasTest').setAttribute('class', 'hidden');
+        clearInterval(animation);
         surveyor.elVoteBox.setAttribute('class', 'hidden');
         surveyor.elResultsChart.removeAttribute('class');
         surveyor.elResultsBox.removeAttribute('class');
@@ -295,3 +297,201 @@ var surveyor = {
 
 surveyor.survey();      
 surveyor.listenAutoRun();
+
+
+
+
+
+
+
+
+
+
+
+
+
+// canvas is   800 x 300
+
+var elCanvas = document.getElementById('canvasTest');
+var context = elCanvas.getContext('2d');
+
+function randomZ ( min, max ) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+var redStraightLines = {
+    x: 400,
+    y: 150,
+    draw: function() {
+        context.beginPath();
+        context.moveTo(this.x, this.y);
+        this.x = randomZ(0,800);
+        this.y = randomZ(0,300);
+        context.lineTo(this.x, this.y);
+        context.strokeStyle = 'red';
+        context.lineWidth = 2;
+        context.stroke();
+        
+        context.beginPath();
+        context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+        context.fillStyle = 'red';
+        context.fill();
+        context.lineWidth = 1;
+        context.strokeStyle = 'red';
+        context.stroke();
+    }
+}
+
+var greenWorm = {
+    x: 400,
+    y: 150,
+    stepSize: 30,
+    draw: function() {
+        context.beginPath();
+        context.moveTo(this.x, this.y);
+        this.getNextCoordinates();
+        context.lineTo(this.x, this.y);
+        context.strokeStyle = 'green';
+        context.lineCap = 'round';
+        context.lineWidth = 10;
+        context.stroke();
+    },
+    getNextCoordinates: function() {
+        var tempX,
+            tempY;
+        do {
+            tempX = randomZ(this.x - this.stepSize, this.x + this.stepSize);
+            tempY = randomZ(this.y - this.stepSize, this.y + this.stepSize);
+        } while(tempX < 0 || tempX > 800 ||tempY < 0 ||tempY > 300);
+        this.x = tempX;
+        this.y = tempY;
+    }
+}
+
+var blueRectanglePath = {
+    xi: 0,
+    yi: 0,
+    xf: 400,
+    yf: 150,
+    stepSize: 100,
+
+    draw: function() {
+        this.getNextCoordinates();
+        context.fillStyle = 'rgba(0,0,255,0.5)';
+        context.strokeStyle = 'blue';
+        context.lineWidth = 5;
+        context.fillRect(this.xi, this.yi, this.xf, this.yf);
+    },
+    getNextCoordinates: function() {
+        var tempX = 0;
+        var tempY = 0;
+        this.xi += this.xf;
+        this.yi += this.yf;
+        console.log('test');
+        do {
+            tempX = randomZ(-this.stepSize, this.stepSize);
+            tempY = randomZ(-this.stepSize, this.stepSize);
+        } while(this.xi + tempX < 0 || this.xi + tempX > 800 || this.yi + tempY < 0 || this.yi + tempY > 300);
+        this.xf = tempX;
+        this.yf = tempY;
+        console.log(this.xf + ',' + this.yf);
+    }
+}
+
+var purpleCircleChain = {
+    minRadius: 15,
+    maxRadius: 60,
+
+    previousXYR: [0, 0, 0],
+
+    currentXYR: [400, 150, 30],
+
+    calcDistance: function(xA, yA, xB, yB) {
+        console.log('in calcDistance method')
+
+        return Math.pow( (Math.pow((xA - xB), 2) + Math.pow((yA - yB), 2)),  0.5);
+    },
+
+    getNextCenter: function() {
+        console.log('in getNextCenter method')
+        var tempX,
+            tempY,
+            tempD;
+        this.previousXYR = this.currentXYR;
+        do {
+            tempX = randomZ(this.previousXYR[0] - (this.previousXYR[2] + this.maxRadius),
+                            this.previousXYR[0] + (this.previousXYR[2] + this.maxRadius));
+            tempY = randomZ(this.previousXYR[1] - (this.previousXYR[2] + this.maxRadius),
+                            this.previousXYR[1] + (this.previousXYR[2] + this.maxRadius));
+            tempD = this.calcDistance(this.previousXYR[0], this.previousXYR[1], tempX, tempY);
+            console.log(tempD);
+            console.log((this.previousXYR[2] + this.minRadius) + ',' + 
+                        (this.previousXYR[2] + this.maxRadius))
+        } while(tempD < (this.previousXYR[2] + this.minRadius) || 
+                tempD > (this.previousXYR[2] + this.maxRadius) ||
+                tempX < (tempD - this.previousXYR[2]) || 
+                tempX > (800 - (tempD - this.previousXYR[2])) ||
+                tempY < (tempD - this.previousXYR[2]) ||
+                tempY > (300 - (tempD - this.previousXYR[2])));
+
+        this.currentXYR = [tempX, tempY, (tempD - this.previousXYR[2])];
+    },
+
+    draw: function() {
+        console.log(this.previousXYR[0], this.previousXYR[1],  this.previousXYR[2], 
+                    this.currentXYR[0],  this.currentXYR[1],  this.currentXYR[2], )
+        this.getNextCenter();
+        context.beginPath();
+        context.arc(this.currentXYR[0], this.currentXYR[1], this.currentXYR[2], 0, 2 * Math.PI, false);
+        context.lineWidth = 1;
+        context.strokeStyle = 'rgba(255, 0, 255, 1)';
+        context.stroke();
+    },
+}
+
+function fadeWhite() {
+    context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    context.fillRect(0,0,800,300);
+}
+
+
+var fadeRainbow = {
+    counter: 0,
+    initiate: function() {
+        context.fillStyle = 'hsla(' + this.counter + ', 50%, 50%, 0.5)';
+        context.fillRect(0,0,800,300);
+        this.counter++;
+    },
+}
+
+
+function mainDraw() {
+    // fadeWhite();
+    fadeRainbow.initiate();
+    redStraightLines.draw();
+    greenWorm.draw();
+    blueRectanglePath.draw();
+    purpleCircleChain.draw();
+}
+
+// var animation = setInterval(mainDraw, 80);
+// setTimeout(setInterval(mainDraw, 5), 10000000);
+
+
+
+var animation;
+var elControls = document.getElementById('animation-controls');
+elControls.addEventListener('click', function(e) {
+    e.preventDefault();
+    if(e.target.id === 'animation-controls') {
+    }
+    else {
+        if(e.target.id === 'startAnimation') {
+            animation = setInterval(mainDraw, 80);
+        }
+        else if(e.target.id === 'endAnimation') {
+            clearInterval(animation);
+        }
+    }
+});
+

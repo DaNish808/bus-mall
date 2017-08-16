@@ -13,6 +13,7 @@ html, body {
 header {
     text-align: center;
     font-family: 'Arima Madurai', cursive;
+    min-width: 1010px;
 }
 
 h1 {
@@ -72,7 +73,7 @@ img {
     margin: auto;
 }
 
-canvas {
+#canvas {
     height: 400px;
     width: 100%;
 }
@@ -136,9 +137,19 @@ tr:nth-child(even) {
     margin: 0px !important;
 }
 
+#canvasTest {
+    position: fixed;
+    top: 600px;
+    height: 300px;
+    width: 800px;
+    left: 0;
+    right: 0;
+    margin: auto
+}
+
 #for-dev {
     position: fixed;
-    width: 21em;
+    width: 23em;
     top: 0;
     right: 0;
     display: flex;
