@@ -38,7 +38,7 @@ var surveyor = {
     products: [],
     usedOptionIndices: [],      // logs every displayed product in order
     numOptions: 3,      // sets number of options displayed per vote
-    numVotes: 500,      // sets number of votes per survey
+    numVotes: 25,      // sets number of votes per survey
     voteCount: 0,       // iterates with each vote until (voteCount === numVotes)
 
     results: [ ['Product', 'Votes', 'Shown', 'Percentage'] ],       // temporary array for tablulating voting results in console (logResults method)
@@ -46,6 +46,29 @@ var surveyor = {
     elVoteBox: document.getElementById('vote-box'),     // parent container of image options
     elOptionImages: [],         // elOptionImages and elOptionDescritions are populated in the setOptionElement method
     elOptionDescriptions: [],   // called by populateElementVariables().
+
+    elResultsChart: document.getElementById('results-chart'),
+    chartData: {
+        type: 'bar',
+        data: {
+            labels: names,
+            datasets: [{
+                label: 'participant',
+                data: [],
+                backgroundColor: 'rgba(255, 0, 0, 1)',
+            }],
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1,
+                    }
+                }]
+            }
+        }
+    },
 
     elResultsBox: document.getElementById('results-box'),
 
@@ -76,6 +99,7 @@ var surveyor = {
     },
 
     instantiateProducts: function() {           // constructs products and adds them to an array
+        this.products = [];
         for(var i = 0; i < names.length; i++) {
             this.products[i] = new Product (names[i], images[i], descriptions[i], ids[i]);
         }
@@ -139,11 +163,12 @@ var surveyor = {
     },
 
     switchLayout: function() {
-        surveyor.elVoteBox.innerHTML = '';
-        surveyor.elVoteBox.setAttribute('class', 'hidden');
-        surveyor.elResultsBox.removeAttribute('class');
         document.getElementById('voting-header').setAttribute('class', 'hidden');
         document.getElementById('results-header').removeAttribute('class');
+        document.getElementById('canvas').removeAttribute('class');
+        surveyor.elVoteBox.setAttribute('class', 'hidden');
+        surveyor.elResultsChart.removeAttribute('class');
+        surveyor.elResultsBox.removeAttribute('class');
     },
 
     renderResults: function() {
@@ -177,8 +202,20 @@ var surveyor = {
                 elTable.appendChild(elTr);
             }
 
-
+        surveyor.elResultsBox.innerHTML = '';
         surveyor.elResultsBox.appendChild(elTable);
+    },
+
+    calcChartData: function() {
+        for(var i = 1; i <= names.length; i++) {
+            this.chartData.data.datasets[0].data.push(this.results[i][1]);
+        }
+    },
+
+    renderChart: function() {
+        var elCanvas = document.getElementById('canvas');
+        this.calcChartData();
+        var productsChart = new Chart(elCanvas, this.chartData);
     },
 
     logResults: function(e) {      // temporarily displays survey results to console
@@ -194,21 +231,25 @@ var surveyor = {
     },
 
     vote: function(e) {     // fires when user clicks an image
-        surveyor.products[parseInt(e.target.getAttribute('data-index'))].voted.push(surveyor.voteCount);
         // pushes the current voteCount onto the clicked product's voted log.
         // productName.voted.length is used by the getVoteCount Property method
-        console.log(surveyor.voteCount);
-        if(surveyor.voteCount + 1 < surveyor.numVotes) {    // if the user still has votes left
-            surveyor.voteCount++;                           // increment the voteCount
-            surveyor.renderOptions();                       // and display next set of voting options
-        }
-        else {                                              // else if the user has used up all their votes
-            console.log('survey over');                     // use the displayed products log (.usedOptionIndices) to calculate
-            surveyor.calcProductsShown();                   // the show count for each product
-            surveyor.elVoteBox.removeEventListener('click', surveyor.vote, false);  // remove event listener
-            surveyor.switchLayout();                        // removes vote-box and adds results-box
-            surveyor.logResults();                         // and show results
-            surveyor.renderResults();
+        if(e.target.id === 'vote-box') {}
+        else {
+            surveyor.products[parseInt(e.target.getAttribute('data-index'))].voted.push(surveyor.voteCount);
+            console.log(surveyor.voteCount);
+            if(surveyor.voteCount + 1 < surveyor.numVotes) {    // if the user still has votes left
+                surveyor.voteCount++;                           // increment the voteCount
+                surveyor.renderOptions();                       // and display next set of voting options
+            }
+            else {                                              // else if the user has used up all their votes
+                console.log('survey over');                     // use the displayed products log (.usedOptionIndices) to calculate
+                surveyor.calcProductsShown();                   // the show count for each product
+                surveyor.elVoteBox.removeEventListener('click', surveyor.vote, false);  // remove event listener
+                surveyor.switchLayout();                        // removes vote-box and adds results-box
+                surveyor.logResults();                         // and show results
+                surveyor.renderResults();
+                surveyor.renderChart();
+            }
         }
     },
 
@@ -225,7 +266,6 @@ var surveyor = {
     },
 
     testSurvey: function(iterations) {     // fires when user clicks an image
-        surveyor.survey();
         for(iterations; iterations > 0; iterations--) {
             surveyor.products[parseInt(surveyor.elOptionDescriptions[0].getAttribute('data-index'))].voted.push(surveyor.voteCount);
             // pushes the current voteCount onto the clicked product's voted log.
@@ -240,7 +280,18 @@ var surveyor = {
         surveyor.switchLayout();                        // removes vote-box and adds results-box
         surveyor.logResults();                         // and show results
         surveyor.renderResults();
+        surveyor.renderChart();
+    },
+
+    listenAutoRun: function() {
+        var elForm = document.getElementsByTagName('form')[0];
+        elForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log(parseInt(this.iterations.value));
+            surveyor.testSurvey(parseInt(this.iterations.value));
+        });
     }
 }
 
 surveyor.survey();      
+surveyor.listenAutoRun();
