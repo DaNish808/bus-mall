@@ -64,13 +64,21 @@ var surveyor = {
         data: {
             labels: names,
             datasets: [{
-                label: 'participant',
+                label: 'number of votes',
                 data: [],
                 backgroundColor: 'rgba(255, 0, 0, 1)',
+            },
+            {
+                label: 'times displayed',
+                data: [],
+                backgroundColor: 'rgba(50, 0, 0, .2)',
             }],
         },
         options: {
             scales: {
+                xAxis: [{
+                    stacked: true
+                }],
                 yAxes: [{
                     ticks: {
                         beginAtZero: true,
@@ -97,6 +105,29 @@ var surveyor = {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true
+                    }
+                }]
+            }
+        }
+    },
+
+    elResultsChartIndividuals: document.getElementById('individuals-results-chart'),
+    chartDataIndividuals: {
+        type: 'bar',
+        data: {
+            labels: names,
+            datasets: [{
+                label: 'current',
+                data: [],
+                backgroundColor: 'rgba(255, 0, 0, 1)',
+            }],
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1,
                     }
                 }]
             }
@@ -199,20 +230,22 @@ var surveyor = {
         if(dataString) {
             this.data.grossResults = JSON.parse(dataString);
         }
+        var dataString = localStorage.getItem('allParticipants');
+        if(dataString) {
+            this.allParticipants = JSON.parse(dataString);
+        }
     },
     
     // stores data.results and updates data.grossResults in local storage
-    dataToLocalStorage: function() {
-        
-        // use dataString to store results
-        var dataString = JSON.stringify(this.data.results);
-        localStorage.setItem('results', dataString);
-
+    dataToLocalStorage: function() {        
         // use dataString to store grossResults
         this.data.grossResults.push(this.data.results);
         dataString = JSON.stringify(this.data.grossResults);
         localStorage.setItem('grossResults', dataString);
 
+        this.allParticipants.push(this.participant);
+        dataString = JSON.stringify(this.allParticipants);
+        localStorage.setItem('allParticipants', dataString);
     },
 
     // sorts through data from grossResults to get summary totals
@@ -248,18 +281,23 @@ var surveyor = {
         }
     },
 
+
+
     switchLayout: function() {
         document.getElementById('voting-header').setAttribute('class', 'hidden');
         document.getElementById('results-header').removeAttribute('class');
         document.getElementById('canvas').removeAttribute('class');
         document.getElementById('canvas-all').removeAttribute('class');
+        document.getElementById('canvas-individuals').removeAttribute('class');
         document.getElementById('canvasTest').setAttribute('class', 'hidden');
         document.getElementById('animation-controls').setAttribute('class', 'hidden');
         document.getElementById('for-dev').setAttribute('class', 'hidden');
+        document.getElementById('history-header').removeAttribute('class');
         clearInterval(animation);
         surveyor.elVoteBox.setAttribute('class', 'hidden');
         surveyor.elResultsChart.removeAttribute('class');
         surveyor.elResultsChartAll.removeAttribute('class');
+        surveyor.elResultsChartIndividuals.removeAttribute('class');
         surveyor.elResultsBox.removeAttribute('class');
     },
 
@@ -298,17 +336,54 @@ var surveyor = {
         surveyor.elResultsBox.appendChild(elTable);
     },
 
+
+
     calcChartData: function(type) {
         if(type === 'current') {
-            this.chartData.data.datasets[0].label = this.participant;
             for(var i = 1; i <= names.length; i++) {
                 this.chartData.data.datasets[0].data.push(this.data.results[i][1]);
+            }
+            for(var i = 1; i <= names.length; i++) {
+                this.chartData.data.datasets[1].data.push(this.data.results[i][2]);
             }
         }
         else if(type === 'all') {
             this.chartDataAll.data.datasets[0].label = 'Sum of All Previous Surveys';
             for(var i = 0; i <= names.length; i++) {
                 this.chartDataAll.data.datasets[0].data.push(this.data.allVoteResults[0][i]);
+            }
+        }
+        else if(type === 'individuals') {
+            // current person
+            this.chartDataIndividuals.data.datasets[0].label = this.participant;
+            for(var i = 1; i <= names.length; i++) {
+                this.chartDataIndividuals.data.datasets[0].data.push(this.data.results[i][1]);
+            }
+                // past individuals
+            var numIndividuals = this.data.grossResults.length 
+            for(var i = (numIndividuals - 2); i >= 0; i--) {
+                var individual = {
+                    label: '',
+                    data: [],
+                    backgroundColor: 'hsla(' + i + ', 30%, 40%, 0.5)',
+                }
+
+                this.chartDataIndividuals.data.datasets;
+                individual.label = this.allParticipants[i];
+                individual.data = [];
+                for(var j = 1; j <= names.length; j++) {
+                    individual.data.push(this.data.grossResults[i][j][1]);
+                }
+                individual.backgroundColor = 'hsla(' + (i * (360 / numIndividuals)) + ', 60%, 50%, 0.3)';
+
+                console.log('*****in iteration ' + i + ': ')
+                console.log('label: ' + individual.label);
+                console.log('data: ' + individual.data);
+                console.log(individual);                
+                this.chartDataIndividuals.data.datasets.push(individual);
+                console.log('*****in iteration ' + i + ': ')
+                console.log(this.chartDataIndividuals.data.datasets);
+                console.log({test: true})
             }
         }
     },
@@ -318,10 +393,13 @@ var surveyor = {
         this.calcChartData('current');
         var productsChart = new Chart(elCanvas, this.chartData);
 
-        
         var elCanvasAll = document.getElementById('canvas-all');
         this.calcChartData('all');
         var productsChart = new Chart(elCanvasAll, this.chartDataAll);
+
+        var elCanvasIndividuals = document.getElementById('canvas-individuals');
+        this.calcChartData('individuals');
+        var productsChart = new Chart(elCanvasIndividuals, this.chartDataIndividuals);
     },
 
     logResults: function(e) {      // temporarily displays survey results to console
@@ -356,6 +434,9 @@ var surveyor = {
                 surveyor.switchLayout();                        // removes vote-box and adds results-box
                 surveyor.logResults();                         // and show results
                 surveyor.renderResults();
+                surveyor.dataFromLocalStorage();
+                surveyor.dataToLocalStorage();
+                surveyor.getAllResults();
                 surveyor.renderChart();
             }
         }
@@ -377,7 +458,7 @@ var surveyor = {
 
 
     testSurvey: function(iterations) {     // fires when user clicks an image
-        for(iterations; iterations > 0; iterations--) {
+        for(iterations -= surveyor.voteCount ; iterations > 0; iterations--) {
             surveyor.products[parseInt(surveyor.elOptionDescriptions[0].getAttribute('data-index'))].voted.push(surveyor.voteCount);
             // pushes the current voteCount onto the clicked product's voted log.
             // productName.voted.length is used by the getVoteCount Property method
@@ -584,9 +665,13 @@ function fadeWhite() {
 
 
 var fadeRainbow = {
-    counter: 0,
+    counter: 180,
     initiate: function() {
-        context.fillStyle = 'hsla(' + this.counter + ', 50%, 50%, 0.5)';
+        context.shadowOffsetX; 0;
+        context.shadowOffsetY; 0;
+        context.shadowColor = 'hsla(' + this.counter + ', 100%, 95%, 0.4)';
+        context.shadowBlur = 10;
+        context.fillStyle = 'hsla(' + this.counter + ', 100%, 95%, 0.4)';
         context.fillRect(0,0,800,300);
         this.counter++;
     },

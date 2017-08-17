@@ -10,18 +10,23 @@ html, body {
     background-color: lightcyan;
 }
 
-header {
+header, #history-header {
     text-align: center;
     font-family: 'Arima Madurai', cursive;
     min-width: 1010px;
 }
 
-h1 {
+h1, h2 {
     margin: 0 auto;
     padding: 1em 1em 0.5em 1em;
     font-size: 3em;
     border-bottom: solid lightskyblue;
     width: 8em;
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 0.3em;
 }
 
 #vote-box {
@@ -64,7 +69,7 @@ img {
     bottom: 0.43em;
 }
 
-#results-chart, #all-results-chart {
+#results-chart, #all-results-chart, #individuals-results-chart {
     height: 450px;
     padding: 25px 25px 25px 5px;
     width: 70%;
@@ -73,7 +78,7 @@ img {
     margin: auto;
 }
 
-#canvas, #canvas-all {
+#canvas, #canvas-all, #canvas-individuals {
     height: 400px;
     width: 100%;
 }
@@ -145,6 +150,16 @@ tr:nth-child(even) {
     left: 0;
     right: 0;
     margin: auto
+}
+
+#animation-controls {
+    display: flex;
+    justify-content: center;
+    background-color: purple;
+}
+
+#animation-controls>button {
+    margin: 0 0.5em;
 }
 
 #for-dev {
