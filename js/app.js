@@ -894,7 +894,7 @@ var fadeRainbow = {
 
 function drawEverything() {
     // fadeWhite();
-    fadeRainbow.initiate();
+    // fadeRainbow.initiate();
     redStraightLines.draw();
     greenWorm.draw();
     blueRectanglePath.draw();
