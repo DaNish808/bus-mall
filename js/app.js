@@ -75,6 +75,10 @@ var surveyor = {
             }],
         },
         options: {
+            title:{
+                display: true,
+                text: 'Your picks'
+            },
             scales: {
                 xAxis: [{
                     stacked: true
@@ -95,17 +99,33 @@ var surveyor = {
         data: {
             labels: names,
             datasets: [{
-                label: 'participant',
+                label: 'voted',
                 data: [],
-                backgroundColor: 'darkblue',
+                backgroundColor: 'rgba(0, 0, 50, 1)',
+            }, 
+            {
+                label: 'shown - voted',
+                data: [],
+                backgroundColor: 'rgba(0, 0, 50, 0.2)',
             }],
         },
         options: {
+            title:{
+                display:true,
+                text:"Sum of all Data"
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            responsive: true,
             scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
                 yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
+                    stacked: true,
+                    beginAtZero: true
                 }]
             }
         }
@@ -123,6 +143,10 @@ var surveyor = {
             }],
         },
         options: {
+            title:{
+                display: true,
+                text: "Previous Survey Results by Individual"
+            },
             scales: {
                 yAxes: [{
                     ticks: {
@@ -265,9 +289,13 @@ var surveyor = {
             for(var j = 1; j < this.data.grossResults[i].length; j++) {
                 allVotes[j - 1] += this.data.grossResults[i][j][1];
                 allShown[j - 1] += this.data.grossResults[i][j][2];
-                allPercentages[j - 1] = ((allPercentages * i) + this.data.grossResults[i][j][3]) / (i+1);
+                allPercentages[j - 1] = ((allPercentages[j - 1] * i) + this.data.grossResults[i][j][3]) / (i+1);
             }
         }
+        for(var i = 0; i < allPercentages.length; i++) {
+            allPercentages[i] = Math.floor(allPercentages[i] * 100) / 100.0;
+        }
+
         this.data.allVoteResults.push(allVotes);
         this.data.allShownResults.push(allShown);
         this.data.allPercentageResults.push(allPercentages);
@@ -340,6 +368,7 @@ var surveyor = {
 
     calcChartData: function(type) {
         if(type === 'current') {
+            this.chartData.options.title.text = this.participant + "'s Picks";
             for(var i = 1; i <= names.length; i++) {
                 this.chartData.data.datasets[0].data.push(this.data.results[i][1]);
             }
@@ -351,6 +380,7 @@ var surveyor = {
             this.chartDataAll.data.datasets[0].label = 'Sum of All Previous Surveys';
             for(var i = 0; i <= names.length; i++) {
                 this.chartDataAll.data.datasets[0].data.push(this.data.allVoteResults[0][i]);
+                this.chartDataAll.data.datasets[1].data.push(this.data.allShownResults[0][i] - this.data.allVoteResults[0][i])
             }
         }
         else if(type === 'individuals') {
