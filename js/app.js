@@ -720,7 +720,7 @@ var purpleCircleChain = {
 var rainbowArcClock = {
     maxAngle: 2*Math.PI,
     minAngle: Math.PI / 8,
-    maxRadius: 100,
+    maxRadius: 60,
     minRadius: 5,
 
     colorIncrementer: 0,
@@ -838,7 +838,7 @@ var rainbowArcCounterClock = {
                     true);
         context.lineWidth = 3;
         context.lineCap = 'round';
-        context.strokeStyle = 'hsl(' + (rainbowArcCounterClock.colorIncrementer * rainbowArcCounterClock.colorSpacer) + ', 100%, 70%)';
+        context.strokeStyle = 'hsl(' + (rainbowArcCounterClock.colorIncrementer * rainbowArcCounterClock.colorSpacer) + ', 80%, 40%)';
         context.stroke();
         rainbowArcCounterClock.colorIncrementer++;
     },
@@ -948,7 +948,7 @@ elControls.addEventListener('click', function(e) {
     }
 
     else if(e.target.id === 'startGreenWormAnimation') {
-        greenWormAnimation = setInterval(greenWorm.draw, 100);
+        greenWormAnimation = setInterval(greenWorm.draw, 10);
         e.target.setAttribute('class', 'hidden');
         document.getElementById('endGreenWormAnimation').removeAttribute('class');
     }
@@ -959,7 +959,7 @@ elControls.addEventListener('click', function(e) {
     }
 
     else if(e.target.id === 'startBlueRectanglesAnimation') {
-        blueRectanglesAnimation = setInterval(blueRectanglePath.draw, 100);
+        blueRectanglesAnimation = setInterval(blueRectanglePath.draw, 45);
         e.target.setAttribute('class', 'hidden');
         document.getElementById('endBlueRectanglesAnimation').removeAttribute('class');
     }
@@ -992,7 +992,7 @@ elControls.addEventListener('click', function(e) {
     }
 
     else if(e.target.id === 'startRainbowArcCCAnimation') {
-        rainbowArcCCAnimation = setInterval(rainbowArcCounterClock.draw, 100);
+        rainbowArcCCAnimation = setInterval(rainbowArcCounterClock.draw, 10);
         e.target.setAttribute('class', 'hidden');
         document.getElementById('endRainbowArcCCAnimation').removeAttribute('class');
     }
