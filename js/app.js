@@ -528,6 +528,10 @@ function randomZ ( min, max ) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function randomFloat (min, max) {
+    return (Math.random() * (max - min + 1)) + min;
+}
+
 var redStraightLines = {
     x: 400,
     y: 150,
@@ -563,6 +567,14 @@ var greenWorm = {
         context.strokeStyle = 'green';
         context.lineCap = 'round';
         context.lineWidth = 10;
+        context.stroke();
+        
+        context.beginPath();
+        context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+        context.fillStyle = 'yellow';
+        context.fill();
+        context.lineWidth = 1;
+        context.strokeStyle = 'yellow';
         context.stroke();
     },
     getNextCoordinates: function() {
@@ -658,6 +670,57 @@ var purpleCircleChain = {
     },
 }
 
+var rainbowArcClock = {
+    maxAngle: 2*Math.PI,
+    minAngle: Math.PI / 8,
+    maxRadius: 70,
+    minRadius: 5,
+
+    colorIncrementer: 0,
+    colorSpacer: 3,
+    previousXYRA: [0,0,0,0,0],
+    currentXYRA: [400, 150, 30, 0, 2*Math.PI],
+
+    getNextParameters: function() {
+
+        this.previousXYRA = this.currentXYRA;
+        var tempX = 0,
+            tempY = 0;
+        do {
+            var newRadius = randomFloat(this.minRadius, this.maxRadius);
+
+            tempX = this.previousXYRA[0] + (this.previousXYRA[2] - newRadius) * Math.cos(this.previousXYRA[4]);
+            tempY = this.previousXYRA[1] - (newRadius - this.previousXYRA[2]) * Math.sin(this.previousXYRA[4]);
+        } while(tempX < (newRadius - this.previousXYRA[2]) || 
+                tempX > (800 - (newRadius - this.previousXYRA[2])) ||
+                tempY < (newRadius - this.previousXYRA[2]) ||
+                tempY > (300 - (newRadius - this.previousXYRA[2])));
+        var newAngle = randomFloat(this.minAngle, this.maxAngle);
+        this.currentXYRA[0] = tempX;
+        this.currentXYRA[1] = tempY;
+        this.currentXYRA[2] = newRadius;
+        this.currentXYRA[3] = this.previousXYRA[4];
+        this.currentXYRA[4] = newAngle;
+
+    },
+
+    draw: function() {
+        this.getNextParameters();
+        context.beginPath();
+        context.arc(this.currentXYRA[0], 
+                    this.currentXYRA[1], 
+                    this.currentXYRA[2], 
+                    this.currentXYRA[3], 
+                    this.currentXYRA[4], 
+                    false);
+        context.lineWidth = 4;
+        context.lineCap = 'round';
+        context.strokeStyle = 'hsl(' + (this.colorIncrementer * this.colorSpacer) + ', 100%, 70%)';
+        context.stroke();
+        this.colorIncrementer--;
+    },
+}
+
 function fadeWhite() {
     context.fillStyle = 'rgba(255, 255, 255, 0.1)';
     context.fillRect(0,0,800,300);
@@ -679,12 +742,13 @@ var fadeRainbow = {
 
 
 function mainDraw() {
-    // fadeWhite();
-    fadeRainbow.initiate();
-    redStraightLines.draw();
-    greenWorm.draw();
-    blueRectanglePath.draw();
-    purpleCircleChain.draw();
+    fadeWhite();
+    // fadeRainbow.initiate();
+    // redStraightLines.draw();
+    // greenWorm.draw();
+    // blueRectanglePath.draw();
+    // purpleCircleChain.draw();
+    rainbowArcClock.draw();
 }
 
 // var animation = setInterval(mainDraw, 80);
