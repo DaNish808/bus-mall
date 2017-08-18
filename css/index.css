@@ -146,12 +146,13 @@ tr:nth-child(even) {
 #distractions {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
     height: 380px;
+    min-width: 1010px;
 }
 
 #canvasTest {
-
     height: 300px;
     width: 800px;
     margin: 0 auto;
@@ -160,11 +161,15 @@ tr:nth-child(even) {
 #animation-controls {
     display: flex;
     justify-content: center;
-    background-color: purple;
+    background-color: white;
+    border: 5px solid lightskyblue;
+    width: 1010px;
+    overflow-x: auto;
+    padding: 0.2em 1.5em;
 }
 
 #animation-controls>button {
-    margin: 0 0.5em;
+    margin: 0.5em;
 }
 
 #for-dev {
