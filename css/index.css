@@ -32,7 +32,7 @@ h2 {
 #vote-box {
     height: 360px;
     width: fit-content;
-    margin: 2em auto;
+    margin: 2em auto 1.5em auto;
     padding: 5px 10px;
     display: flex;
     justify-content: center;
@@ -137,19 +137,24 @@ tr:nth-child(even) {
 
 .hidden {
     visibility: hidden !important;
+    display: none;
     height: 0px !important;
     padding: 0px !important;
     margin: 0px !important;
 }
 
+#distractions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 380px;
+}
+
 #canvasTest {
-    position: absolute;
-    top: 600px;
+
     height: 300px;
     width: 800px;
-    left: 0;
-    right: 0;
-    margin: auto
+    margin: 0 auto;
 }
 
 #animation-controls {

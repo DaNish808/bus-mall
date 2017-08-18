@@ -321,7 +321,16 @@ var surveyor = {
         document.getElementById('animation-controls').setAttribute('class', 'hidden');
         document.getElementById('for-dev').setAttribute('class', 'hidden');
         document.getElementById('history-header').removeAttribute('class');
-        clearInterval(animation);
+        clearInterval(animationAll);
+        clearInterval(redLinesAnimation);
+        clearInterval(greenWormAnimation);
+        clearInterval(blueRectanglesAnimation);
+        clearInterval(purpleCirclesAnimation);
+        clearInterval(rainbowArcCCAnimation);
+        clearInterval(rainbowArcCWAnimation);
+        clearInterval(fadeRainbowAnimation);
+        clearInterval(fadeBlackAnimation);
+        clearInterval(fadeWhiteAnimation);
         surveyor.elVoteBox.setAttribute('class', 'hidden');
         surveyor.elResultsChart.removeAttribute('class');
         surveyor.elResultsChartAll.removeAttribute('class');
@@ -585,39 +594,45 @@ var redStraightLines = {
     }
 }
 
+
+
 var greenWorm = {
     x: 400,
     y: 150,
     stepSize: 30,
+
+    
+    getNextCoordinates: function() {
+        var tempX,
+            tempY;
+        do {
+            tempX = randomZ(greenWorm.x - greenWorm.stepSize, greenWorm.x + greenWorm.stepSize);
+            tempY = randomZ(greenWorm.y - greenWorm.stepSize, greenWorm.y + greenWorm.stepSize);
+        } while(tempX < 0 || tempX > 800 ||tempY < 0 ||tempY > 300);
+        greenWorm.x = tempX;
+        greenWorm.y = tempY;
+    },
     draw: function() {
         context.beginPath();
-        context.moveTo(this.x, this.y);
-        this.getNextCoordinates();
-        context.lineTo(this.x, this.y);
+        context.moveTo(greenWorm.x, greenWorm.y);
+        greenWorm.getNextCoordinates();
+        context.lineTo(greenWorm.x, greenWorm.y);
         context.strokeStyle = 'green';
         context.lineCap = 'round';
         context.lineWidth = 10;
         context.stroke();
         
         context.beginPath();
-        context.arc(this.x, this.y, 5, 0, 2 * Math.PI, false);
+        context.arc(greenWorm.x, greenWorm.y, 5, 0, 2 * Math.PI, false);
         context.fillStyle = 'yellow';
         context.fill();
         context.lineWidth = 1;
         context.strokeStyle = 'yellow';
         context.stroke();
     },
-    getNextCoordinates: function() {
-        var tempX,
-            tempY;
-        do {
-            tempX = randomZ(this.x - this.stepSize, this.x + this.stepSize);
-            tempY = randomZ(this.y - this.stepSize, this.y + this.stepSize);
-        } while(tempX < 0 || tempX > 800 ||tempY < 0 ||tempY > 300);
-        this.x = tempX;
-        this.y = tempY;
-    }
 }
+
+
 
 var blueRectanglePath = {
     xi: 0,
@@ -626,28 +641,28 @@ var blueRectanglePath = {
     yf: 150,
     stepSize: 100,
 
-    draw: function() {
-        this.getNextCoordinates();
-        context.fillStyle = 'rgba(0,0,255,0.5)';
-        context.strokeStyle = 'blue';
-        context.lineWidth = 5;
-        context.fillRect(this.xi, this.yi, this.xf, this.yf);
-    },
     getNextCoordinates: function() {
         var tempX = 0;
         var tempY = 0;
-        this.xi += this.xf;
-        this.yi += this.yf;
-        console.log('test');
+        blueRectanglePath.xi += blueRectanglePath.xf;
+        blueRectanglePath.yi += blueRectanglePath.yf;
         do {
-            tempX = randomZ(-this.stepSize, this.stepSize);
-            tempY = randomZ(-this.stepSize, this.stepSize);
-        } while(this.xi + tempX < 0 || this.xi + tempX > 800 || this.yi + tempY < 0 || this.yi + tempY > 300);
-        this.xf = tempX;
-        this.yf = tempY;
-        console.log(this.xf + ',' + this.yf);
-    }
+            tempX = randomZ(-blueRectanglePath.stepSize, blueRectanglePath.stepSize);
+            tempY = randomZ(-blueRectanglePath.stepSize, blueRectanglePath.stepSize);
+        } while(blueRectanglePath.xi + tempX < 0 || blueRectanglePath.xi + tempX > 800 || blueRectanglePath.yi + tempY < 0 || blueRectanglePath.yi + tempY > 300);
+        blueRectanglePath.xf = tempX;
+        blueRectanglePath.yf = tempY;
+    },
+    draw: function() {
+        blueRectanglePath.getNextCoordinates();
+        context.fillStyle = 'rgba(0,0,255,0.5)';
+        context.strokeStyle = 'blue';
+        context.lineWidth = 5;
+        context.fillRect(blueRectanglePath.xi, blueRectanglePath.yi, blueRectanglePath.xf, blueRectanglePath.yf);
+    },
 }
+
+
 
 var purpleCircleChain = {
     minRadius: 15,
@@ -668,42 +683,44 @@ var purpleCircleChain = {
         var tempX,
             tempY,
             tempD;
-        this.previousXYR = this.currentXYR;
+        purpleCircleChain.previousXYR = purpleCircleChain.currentXYR;
         do {
-            tempX = randomZ(this.previousXYR[0] - (this.previousXYR[2] + this.maxRadius),
-                            this.previousXYR[0] + (this.previousXYR[2] + this.maxRadius));
-            tempY = randomZ(this.previousXYR[1] - (this.previousXYR[2] + this.maxRadius),
-                            this.previousXYR[1] + (this.previousXYR[2] + this.maxRadius));
-            tempD = this.calcDistance(this.previousXYR[0], this.previousXYR[1], tempX, tempY);
+            tempX = randomZ(purpleCircleChain.previousXYR[0] - (purpleCircleChain.previousXYR[2] + purpleCircleChain.maxRadius),
+                            purpleCircleChain.previousXYR[0] + (purpleCircleChain.previousXYR[2] + purpleCircleChain.maxRadius));
+            tempY = randomZ(purpleCircleChain.previousXYR[1] - (purpleCircleChain.previousXYR[2] + purpleCircleChain.maxRadius),
+                            purpleCircleChain.previousXYR[1] + (purpleCircleChain.previousXYR[2] + purpleCircleChain.maxRadius));
+            tempD = purpleCircleChain.calcDistance(purpleCircleChain.previousXYR[0], purpleCircleChain.previousXYR[1], tempX, tempY);
             console.log(tempD);
-            console.log((this.previousXYR[2] + this.minRadius) + ',' + 
-                        (this.previousXYR[2] + this.maxRadius))
-        } while(tempD < (this.previousXYR[2] + this.minRadius) || 
-                tempD > (this.previousXYR[2] + this.maxRadius) ||
-                tempX < (tempD - this.previousXYR[2]) || 
-                tempX > (800 - (tempD - this.previousXYR[2])) ||
-                tempY < (tempD - this.previousXYR[2]) ||
-                tempY > (300 - (tempD - this.previousXYR[2])));
+            console.log((purpleCircleChain.previousXYR[2] + purpleCircleChain.minRadius) + ',' + 
+                        (purpleCircleChain.previousXYR[2] + purpleCircleChain.maxRadius))
+        } while(tempD < (purpleCircleChain.previousXYR[2] + purpleCircleChain.minRadius) || 
+                tempD > (purpleCircleChain.previousXYR[2] + purpleCircleChain.maxRadius) ||
+                tempX < (tempD - purpleCircleChain.previousXYR[2]) || 
+                tempX > (800 - (tempD - purpleCircleChain.previousXYR[2])) ||
+                tempY < (tempD - purpleCircleChain.previousXYR[2]) ||
+                tempY > (300 - (tempD - purpleCircleChain.previousXYR[2])));
 
-        this.currentXYR = [tempX, tempY, (tempD - this.previousXYR[2])];
+        purpleCircleChain.currentXYR = [tempX, tempY, (tempD - purpleCircleChain.previousXYR[2])];
     },
 
     draw: function() {
-        console.log(this.previousXYR[0], this.previousXYR[1],  this.previousXYR[2], 
-                    this.currentXYR[0],  this.currentXYR[1],  this.currentXYR[2], )
-        this.getNextCenter();
+        console.log(purpleCircleChain.previousXYR[0], purpleCircleChain.previousXYR[1],  purpleCircleChain.previousXYR[2], 
+                    purpleCircleChain.currentXYR[0],  purpleCircleChain.currentXYR[1],  purpleCircleChain.currentXYR[2], )
+        purpleCircleChain.getNextCenter();
         context.beginPath();
-        context.arc(this.currentXYR[0], this.currentXYR[1], this.currentXYR[2], 0, 2 * Math.PI, false);
-        context.lineWidth = 1;
+        context.arc(purpleCircleChain.currentXYR[0], purpleCircleChain.currentXYR[1], purpleCircleChain.currentXYR[2], 0, 2 * Math.PI, false);
+        context.lineWidth = 4;
         context.strokeStyle = 'rgba(255, 0, 255, 1)';
         context.stroke();
     },
 }
 
+
+
 var rainbowArcClock = {
     maxAngle: 2*Math.PI,
     minAngle: Math.PI / 8,
-    maxRadius: 70,
+    maxRadius: 100,
     minRadius: 5,
 
     colorIncrementer: 0,
@@ -712,94 +729,311 @@ var rainbowArcClock = {
     currentXYRA: [400, 150, 30, 0, 2*Math.PI],
 
     getNextParameters: function() {
-
-        this.previousXYRA = this.currentXYRA;
+        var escapeCountdown = 1000;
+        rainbowArcClock.previousXYRA = rainbowArcClock.currentXYRA;
         var tempX = 0,
             tempY = 0;
         do {
-            var newRadius = randomFloat(this.minRadius, this.maxRadius);
-
-            tempX = this.previousXYRA[0] + (this.previousXYRA[2] - newRadius) * Math.cos(this.previousXYRA[4]);
-            tempY = this.previousXYRA[1] - (newRadius - this.previousXYRA[2]) * Math.sin(this.previousXYRA[4]);
-        } while(tempX < (newRadius - this.previousXYRA[2]) || 
-                tempX > (800 - (newRadius - this.previousXYRA[2])) ||
-                tempY < (newRadius - this.previousXYRA[2]) ||
-                tempY > (300 - (newRadius - this.previousXYRA[2])));
-        var newAngle = randomFloat(this.minAngle, this.maxAngle);
-        this.currentXYRA[0] = tempX;
-        this.currentXYRA[1] = tempY;
-        this.currentXYRA[2] = newRadius;
-        this.currentXYRA[3] = this.previousXYRA[4];
-        this.currentXYRA[4] = newAngle;
+            if(escapeCountdown > escapeCountdown * 0.99) {
+                var newRadius = randomFloat(rainbowArcClock.minRadius, rainbowArcClock.maxRadius);
+            }
+            else if(escapeCountdown < escapeCountdown * 0.99) {
+                var newRadius = randomFloat(rainbowArcClock.minRadius, (0.5 * rainbowArcClock.maxRadius));
+            }
+            else if(escapeCountdown < (escapeCountdown) * 0.9) {
+                var newRadius = randomFloat(rainbowArcClock.minRadius, 0.1 * rainbowArcClock.maxRadius);
+            }
+            tempX = rainbowArcClock.previousXYRA[0] + (rainbowArcClock.previousXYRA[2] - newRadius) * Math.cos(rainbowArcClock.previousXYRA[4]);
+            tempY = rainbowArcClock.previousXYRA[1] - (newRadius - rainbowArcClock.previousXYRA[2]) * Math.sin(rainbowArcClock.previousXYRA[4]);
+            escapeCountdown--;
+            if(escapeCountdown === 0) {
+                newRadius = randomFloat(rainbowArcClock.minRadius, rainbowArcClock.maxRadius);
+                tempX = randomZ(100, 700);
+                tempY = randomZ(50, 250);
+            }
+        } while(tempX < (newRadius - rainbowArcClock.previousXYRA[2]) || 
+                tempX > (800 - (newRadius - rainbowArcClock.previousXYRA[2])) ||
+                tempY < (newRadius - rainbowArcClock.previousXYRA[2]) ||
+                tempY > (300 - (newRadius - rainbowArcClock.previousXYRA[2])));
+        var newAngle = randomFloat(rainbowArcClock.minAngle, rainbowArcClock.maxAngle);
+        rainbowArcClock.currentXYRA[0] = tempX;
+        rainbowArcClock.currentXYRA[1] = tempY;
+        rainbowArcClock.currentXYRA[2] = newRadius;
+        rainbowArcClock.currentXYRA[3] = rainbowArcClock.previousXYRA[4];
+        rainbowArcClock.currentXYRA[4] = newAngle;
 
     },
 
     draw: function() {
-        this.getNextParameters();
+        rainbowArcClock.getNextParameters();
         context.beginPath();
-        context.arc(this.currentXYRA[0], 
-                    this.currentXYRA[1], 
-                    this.currentXYRA[2], 
-                    this.currentXYRA[3], 
-                    this.currentXYRA[4], 
+        context.arc(rainbowArcClock.currentXYRA[0], 
+                    rainbowArcClock.currentXYRA[1], 
+                    rainbowArcClock.currentXYRA[2], 
+                    rainbowArcClock.currentXYRA[3], 
+                    rainbowArcClock.currentXYRA[4], 
                     false);
-        context.lineWidth = 4;
+        context.lineWidth = 7;
         context.lineCap = 'round';
-        context.strokeStyle = 'hsl(' + (this.colorIncrementer * this.colorSpacer) + ', 100%, 70%)';
+        context.strokeStyle = 'hsl(' + (rainbowArcClock.colorIncrementer * rainbowArcClock.colorSpacer) + ', 100%, 70%)';
         context.stroke();
-        this.colorIncrementer--;
+        rainbowArcClock.colorIncrementer--;
     },
 }
+var rainbowArcCounterClock = {
+    maxAngle: 2*Math.PI,
+    minAngle: Math.PI / 8,
+    maxRadius: 100,
+    minRadius: 5,
+
+    colorIncrementer: 60,
+    colorSpacer: 2,
+    previousXYRA: [0,0,0,0,0],
+    currentXYRA: [400, 150, 30, 0, 2*Math.PI],
+
+    getNextParameters: function() {
+        var escapeCountdown = 1000;
+        rainbowArcCounterClock.previousXYRA = rainbowArcCounterClock.currentXYRA;
+        var tempX = 0,
+            tempY = 0;
+        do {
+            if(escapeCountdown > escapeCountdown * 0.99) {
+                var newRadius = randomFloat(rainbowArcCounterClock.minRadius, rainbowArcCounterClock.maxRadius);
+            }
+            else if(escapeCountdown < escapeCountdown * 0.99) {
+                var newRadius = randomFloat(rainbowArcCounterClock.minRadius, (0.5 * rainbowArcCounterClock.maxRadius));
+            }
+            else if(escapeCountdown < (escapeCountdown) * 0.9) {
+                var newRadius = randomFloat(rainbowArcCounterClock.minRadius, 0.1 * rainbowArcCounterClock.maxRadius);
+            }
+            tempX = rainbowArcCounterClock.previousXYRA[0] + (rainbowArcCounterClock.previousXYRA[2] - newRadius) * Math.cos(rainbowArcCounterClock.previousXYRA[4]);
+            tempY = rainbowArcCounterClock.previousXYRA[1] - (newRadius - rainbowArcCounterClock.previousXYRA[2]) * Math.sin(rainbowArcCounterClock.previousXYRA[4]);
+            escapeCountdown--;
+            if(escapeCountdown === 0) {
+                newRadius = randomFloat(rainbowArcCounterClock.minRadius, rainbowArcCounterClock.maxRadius);
+                tempX = randomZ(100, 700);
+                tempY = randomZ(50, 250);
+            }
+        } while(tempX < (newRadius - rainbowArcCounterClock.previousXYRA[2]) || 
+                tempX > (800 - (newRadius - rainbowArcCounterClock.previousXYRA[2])) ||
+                tempY < (newRadius - rainbowArcCounterClock.previousXYRA[2]) ||
+                tempY > (300 - (newRadius - rainbowArcCounterClock.previousXYRA[2])));
+        var newAngle = randomFloat(rainbowArcCounterClock.minAngle, rainbowArcCounterClock.maxAngle);
+        rainbowArcCounterClock.currentXYRA[0] = tempX;
+        rainbowArcCounterClock.currentXYRA[1] = tempY;
+        rainbowArcCounterClock.currentXYRA[2] = newRadius;
+        rainbowArcCounterClock.currentXYRA[3] = rainbowArcCounterClock.previousXYRA[4];
+        rainbowArcCounterClock.currentXYRA[4] = newAngle;
+
+    },
+
+    draw: function() {
+        rainbowArcCounterClock.getNextParameters();
+        context.beginPath();
+        context.arc(rainbowArcCounterClock.currentXYRA[0], 
+                    rainbowArcCounterClock.currentXYRA[1], 
+                    rainbowArcCounterClock.currentXYRA[2], 
+                    rainbowArcCounterClock.currentXYRA[3], 
+                    rainbowArcCounterClock.currentXYRA[4], 
+                    true);
+        context.lineWidth = 3;
+        context.lineCap = 'round';
+        context.strokeStyle = 'hsl(' + (rainbowArcCounterClock.colorIncrementer * rainbowArcCounterClock.colorSpacer) + ', 100%, 70%)';
+        context.stroke();
+        rainbowArcCounterClock.colorIncrementer++;
+    },
+}
+function rainbowArcs() {
+    rainbowArcClock.draw();
+    rainbowArcCounterClock.draw();
+}
+function drawRainbowArcs() {
+    var drawingRainbowArcs = setInterval(rainbowArcs, 80);
+}
+function stopRainbowArcs() {
+    clearInterval(drawingRainbowArcs);
+}
+
+
+
+// var randomWave = {
+//     isHappening: false,
+//     xFront: 0, 
+//     waveHeight: 300,
+
+//     draw: function() {}
+// }
 
 function fadeWhite() {
     context.fillStyle = 'rgba(255, 255, 255, 0.1)';
     context.fillRect(0,0,800,300);
 }
 
+function fadeBlack() {
+    context.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    context.fillRect(0,0,800,300);
+}
 
 var fadeRainbow = {
     counter: 180,
     initiate: function() {
         context.shadowOffsetX; 0;
         context.shadowOffsetY; 0;
-        context.shadowColor = 'hsla(' + this.counter + ', 100%, 95%, 0.4)';
+        context.shadowColor = 'hsla(' + fadeRainbow.counter + ', 100%, 95%, 0.4)';
         context.shadowBlur = 10;
-        context.fillStyle = 'hsla(' + this.counter + ', 100%, 95%, 0.4)';
+        context.fillStyle = 'hsla(' + fadeRainbow.counter + ', 100%, 95%, 0.4)';
         context.fillRect(0,0,800,300);
-        this.counter++;
+        fadeRainbow.counter++;
     },
 }
 
 
-function mainDraw() {
-    fadeWhite();
-    // fadeRainbow.initiate();
-    // redStraightLines.draw();
-    // greenWorm.draw();
-    // blueRectanglePath.draw();
-    // purpleCircleChain.draw();
+
+
+
+
+function drawEverything() {
+    // fadeWhite();
+    fadeRainbow.initiate();
+    redStraightLines.draw();
+    greenWorm.draw();
+    blueRectanglePath.draw();
+    purpleCircleChain.draw();
     rainbowArcClock.draw();
+    rainbowArcCounterClock.draw();
 }
 
-// var animation = setInterval(mainDraw, 80);
-// setTimeout(setInterval(mainDraw, 5), 10000000);
+// var animation = setInterval(drawEverything, 80);
+// setTimeout(setInterval(drawEverything, 5), 10000000);
 
 
 
 
-var animation;
+var animationAll,
+    redLinesAnimation,
+    greenWormAnimation,
+    blueRectanglesAnimation,
+    purpleCirclesAnimation,
+    rainbowArcCCAnimation,
+    rainbowArcCWAnimation,
+    fadeWhiteAnimation,
+    fadeBlackAnimation,
+    fadeRainbowAnimation;
+
 var elControls = document.getElementById('animation-controls');
 elControls.addEventListener('click', function(e) {
     e.preventDefault();
     if(e.target.id === 'animation-controls') {
     }
-    else {
-        if(e.target.id === 'startAnimation') {
-            animation = setInterval(mainDraw, 80);
-        }
-        else if(e.target.id === 'endAnimation') {
-            clearInterval(animation);
-        }
+    else if(e.target.id === 'startAllAnimation') {
+        animationAll = setInterval(drawEverything, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endAllAnimation').removeAttribute('class');
     }
+    else if(e.target.id === 'endAllAnimation') {
+        clearInterval(animationAll);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startAllAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startRedLinesAnimation') {
+        redLinesAnimation = setInterval(redStraightLines.draw, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endRedLinesAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endRedLinesAnimation') {
+        clearInterval(redLinesAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startRedLinesAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startGreenWormAnimation') {
+        greenWormAnimation = setInterval(greenWorm.draw, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endGreenWormAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endGreenWormAnimation') {
+        clearInterval(greenWormAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startGreenWormAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startBlueRectanglesAnimation') {
+        blueRectanglesAnimation = setInterval(blueRectanglePath.draw, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endBlueRectanglesAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endBlueRectanglesAnimation') {
+        clearInterval(blueRectanglesAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startBlueRectanglesAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startPurpleCirclesAnimation') {
+        purpleCirclesAnimation = setInterval(purpleCircleChain.draw, 160);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endPurpleCirclesAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endPurpleCirclesAnimation') {
+        clearInterval(purpleCirclesAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startPurpleCirclesAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startRainbowArcCWAnimation') {
+        rainbowArcCWAnimation = setInterval(rainbowArcClock.draw, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endRainbowArcCWAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endRainbowArcCWAnimation') {
+        clearInterval(rainbowArcCWAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startRainbowArcCWAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startRainbowArcCCAnimation') {
+        rainbowArcCCAnimation = setInterval(rainbowArcCounterClock.draw, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endRainbowArcCCAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endRainbowArcCCAnimation') {
+        clearInterval(rainbowArcCCAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startRainbowArcCCAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startFadeRainbowAnimation') {
+        fadeRainbowAnimation = setInterval(fadeRainbow.initiate, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endFadeRainbowAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endFadeRainbowAnimation') {
+        clearInterval(fadeRainbowAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startFadeRainbowAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startFadeWhiteAnimation') {
+        fadeWhiteAnimation = setInterval(fadeWhite, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endFadeWhiteAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endFadeWhiteAnimation') {
+        clearInterval(fadeWhiteAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startFadeWhiteAnimation').removeAttribute('class');
+    }
+
+    else if(e.target.id === 'startFadeBlackAnimation') {
+        fadeBlackAnimation = setInterval(fadeBlack, 100);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('endFadeBlackAnimation').removeAttribute('class');
+    }
+    else if(e.target.id === 'endFadeBlackAnimation') {
+        clearInterval(fadeBlackAnimation);
+        e.target.setAttribute('class', 'hidden');
+        document.getElementById('startFadeBlackAnimation').removeAttribute('class');
+    }
+
 });
 
