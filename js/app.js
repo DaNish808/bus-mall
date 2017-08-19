@@ -720,7 +720,7 @@ var purpleCircleChain = {
 var rainbowArcClock = {
     maxAngle: 2*Math.PI,
     minAngle: Math.PI / 8,
-    maxRadius: 60,
+    maxRadius: 150,
     minRadius: 5,
 
     colorIncrementer: 0,
@@ -783,7 +783,7 @@ var rainbowArcClock = {
 var rainbowArcCounterClock = {
     maxAngle: 2*Math.PI,
     minAngle: Math.PI / 8,
-    maxRadius: 100,
+    maxRadius: 60,
     minRadius: 5,
 
     colorIncrementer: 60,
